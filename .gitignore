@@ -1,0 +1,16 @@
+target
+.classpath
+.settings
+.project
+README.html
+src/main/java/sandbox
+src/main/java/monq
+src/main/java/monq/**/*
+doc-monq
+doc-monq/**/*
+doc-zbw-stwfsa
+doc-zbw-stwfsa/*
+doc-files
+out
+tmp
+dependency-reduced-pom.xml
