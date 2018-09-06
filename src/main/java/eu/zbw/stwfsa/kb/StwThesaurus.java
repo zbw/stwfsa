@@ -117,6 +117,9 @@ public class StwThesaurus implements Closeable {
             + "{?cidres skos:prefLabel ?label .}" //
             + " UNION " //
             + "{?cidres skos:altLabel ?label .}}";
+    // + "FILTER not EXISTS { ?cidres OWL.deprecated true . }"; ??
+    // note on deprecated terms: regarding the stw this is not an issue
+    // deprecated concepts use rdfs:label instead of skos:(pref|alt)Label
     Query q = QueryFactory.create(queryString);
     ResultSet results = QueryExecutionFactory.create(q, stw).execSelect();
     while (results.hasNext()) {
