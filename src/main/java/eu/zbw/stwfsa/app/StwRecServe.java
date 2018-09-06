@@ -81,6 +81,7 @@ public class StwRecServe {
     Path stwPth = Paths.get(stwDirPth, "stw.nt");
     try (StwThesaurus stw = new StwThesaurus(stwPth);) {
       System.out.println("run with STW: " + stw.getVersion());
+      StwAnnotator annotator = new StwAnnotator(stw, StwAutomataFactory.STRATEGY_DEFAULT);
 
       get("/version", (req, res) -> String.format("StwRecServe Version: %s", StwRecApp.VERSION));
       post("/process-json", "application/json", (req, res) -> {
@@ -88,7 +89,6 @@ public class StwRecServe {
 
         JsonArray records = parser.parse(req.body()).getAsJsonArray();
         for (JsonElement record : records) {
-          StwAnnotator annotator = new StwAnnotator(stw, StwAutomataFactory.STRATEGY_DEFAULT);
           JsonObject reco = record.getAsJsonObject();
           String id = reco.get("id").getAsString();
           String content = reco.get("content").getAsString();

@@ -55,6 +55,7 @@ public class StwAnnotator {
     rInput = StwAutomataFactory.preprocessContent(rInput, vocStrategy);
     // process input:
     CharSource in = new CharSequenceCharSource(rInput);
+    run.clientData = ClientDataFactory.produceNewClientData(); // clear client data
     run.setIn(in);
     run.filter();
     // create return list:
