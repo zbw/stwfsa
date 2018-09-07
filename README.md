@@ -64,7 +64,7 @@ If you want to use STWFSA programmatically, please have a look at [StwAnnotator]
 
 # Change Notes
 
-## v0.3-SNAPSHOT
+### v0.3-SNAPSHOT
 
 - add simple server example
 
