@@ -37,6 +37,9 @@ Add the argument `-info` to print offsets and matching text. The call
 `java -cp zbw-a1-match-fsa-$VERSION.jar eu.zbw.stwfsa.app.StwRecApp -help`
 explains all arguments and usage in more detail.
 
+You may want to have a look at [StwRecServe](src/main/java/eu/zbw/stwfsa/app/StwRecServe.java) as a starting point
+for offering dictionary matching as a webservice. 
+
 ## Input and Output
 
 STWFSA reads and writes tab-separated (TSV) data.
@@ -60,6 +63,10 @@ Please note, option `info` has precedence over option `compressed`.
 If you want to use STWFSA programmatically, please have a look at [StwAnnotator](src/main/java/eu/zbw/stwfsa/annotator/StwAnnotator.java).
 
 # Change Notes
+
+## v0.3-SNAPSHOT
+
+- add simple server example
 
 ### v0.2 - May 14, 2018
 

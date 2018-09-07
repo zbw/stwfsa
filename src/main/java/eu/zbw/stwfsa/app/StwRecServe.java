@@ -19,12 +19,18 @@ package eu.zbw.stwfsa.app;
 
 //import static spark.Spark.*;
 import static spark.Spark.get;
+import static spark.Spark.port;
 import static spark.Spark.post;
 
+import java.io.FileNotFoundException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.StreamSupport;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -62,6 +68,8 @@ curl "http://localhost:4567/process-json" -H "Host: localhost:4567"-H "Accept: a
  */
 public class StwRecServe {
 
+  private static final Logger log = LoggerFactory.getLogger(StwRecServe.class);
+
   /**
    * by default, listening on port: 4567.
    * 
@@ -72,15 +80,27 @@ public class StwRecServe {
     String prog = System.getProperty("argv0", "StwRecApp");
     Commandline cmd = new Commandline(prog, "Server to match documents against STW thesaurus", "",
             "on windows, use batch script instead of cygwin", 0, Integer.MAX_VALUE);
-    // port(4567);
+    int port = 4567;
+    port(port);
+    log.info("use port: " + port);
 
-    String stwDirPth = System.getenv("STW_DIR");
-    if (stwDirPth == null) {
-      throw new IllegalArgumentException("STW_PTH environment variable not specified");
+    Path stwPth = null;
+    if (System.getenv().containsKey("STW_PTH")) {
+      stwPth = Paths.get(System.getenv("STW_PTH"));
+    } else {
+      String stwDirPth = System.getenv("STW_DIR");
+      if (stwDirPth == null) {
+        throw new IllegalArgumentException("STW_PTH environment variable not specified");
+      }
+      stwPth = Paths.get(stwDirPth, "stw.nt");
     }
-    Path stwPth = Paths.get(stwDirPth, "stw.nt");
+    if (!Files.isRegularFile(stwPth)) {
+      throw new FileNotFoundException(stwPth.toString());
+    }
+
     try (StwThesaurus stw = new StwThesaurus(stwPth);) {
-      System.out.println("run with STW: " + stw.getVersion());
+      String msg = "run server with STW: " + stw.getVersion();
+      log.info(msg);
       StwAnnotator annotator = new StwAnnotator(stw, StwAutomataFactory.STRATEGY_DEFAULT);
 
       get("/version", (req, res) -> String.format("StwRecServe Version: %s", StwRecApp.VERSION));

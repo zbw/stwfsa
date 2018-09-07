@@ -55,7 +55,7 @@ import monq.jfa.Nfa;
  */
 public class StwRecApp {
 
-  public static final String VERSION = "0.2";
+  public static final String VERSION = "0.3";
 
   /**
    * see README.md for usage example.
