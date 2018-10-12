@@ -55,6 +55,8 @@ import monq.jfa.Nfa;
  */
 public class StwRecApp {
 
+  public static final String METHOD_NAME = "stwfsa";
+
   public static final String VERSION = "0.3";
 
   /**

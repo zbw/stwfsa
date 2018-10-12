@@ -57,7 +57,7 @@ import monq.clifj.Commandline;
  * <code>
 curl "http://localhost:4567/process-json" -H "Host: localhost:4567"-H "Accept: application/json" --compressed -H "Connection: keep-alive" -H "Upgrade-Insecure-Requests: 1" -H "Pragma: no-cache" -H "Cache-Control: no-cache" --data "
 [
-{"id": "1234", "content": "Air polution in Northern Germany"},
+{"id": "1234", "content": "Air pollution in Northern Germany"},
 {"id": "5678", "content": "The automobile industry and tax regulation effects"}
 ]"
  * </code>
@@ -79,9 +79,10 @@ public class StwRecServe {
   public static void main(String[] argz) throws Exception {
     String prog = System.getProperty("argv0", "StwRecApp");
     Commandline cmd = new Commandline(prog, "Server to match documents against STW thesaurus", "",
-            "on windows, use batch script instead of cygwin", 0, Integer.MAX_VALUE);
+            "", 0, Integer.MAX_VALUE);
     int port = 4567;
     port(port);
+    log.info("START server, version: " + StwRecApp.VERSION);
     log.info("use port: " + port);
 
     Path stwPth = null;
@@ -102,11 +103,19 @@ public class StwRecServe {
       String msg = "run server with STW: " + stw.getVersion();
       log.info(msg);
       StwAnnotator annotator = new StwAnnotator(stw, StwAutomataFactory.STRATEGY_DEFAULT);
+      JsonObject jobjAbout = new JsonObject();
+      jobjAbout.addProperty("app_name", StwRecApp.METHOD_NAME);
+      jobjAbout.addProperty("app_version", StwRecApp.VERSION);
+      jobjAbout.addProperty("kb_version", stw.getVersion().getString());
 
-      get("/version", (req, res) -> String.format("StwRecServe Version: %s", StwRecApp.VERSION));
+      get("/about", (req, res) -> {
+        res.type("application/json");
+        return jobjAbout;
+      });
+      get("/version", (req, res) -> String.format("%s Version: %s", StwRecApp.METHOD_NAME,
+              StwRecApp.VERSION));
       post("/process-json", "application/json", (req, res) -> {
         JsonParser parser = new JsonParser();
-
         JsonArray records = parser.parse(req.body()).getAsJsonArray();
         for (JsonElement record : records) {
           JsonObject reco = record.getAsJsonObject();
@@ -121,7 +130,8 @@ public class StwRecServe {
                   });
           reco.add("annotations", jsonAnnotations);
         }
-        return records; // res;
+        res.type("application/json");
+        return records;
       });
     }
   }
