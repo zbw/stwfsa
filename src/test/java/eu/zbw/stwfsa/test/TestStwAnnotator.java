@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -70,13 +71,54 @@ public class TestStwAnnotator {
   public void testStwAnnotator() throws IOException {
     String content = "Fishing in the North Sea : Trade Agreements between Finland, Sweden, and Russia";
     List<StwAnnotation> cids = annotator.process(content);
-    Set<String> expectedMatches = new TreeSet<>(Arrays.asList("North Sea", "Finland", "Russia"));
+    Set<String> stringsToMatch = new TreeSet<>(Arrays.asList("North Sea", "Finland", "Russia"));
+    for (Iterator iterator = cids.iterator(); iterator.hasNext();) {
+      StwAnnotation stwAnnotation = (StwAnnotation) iterator.next();
+      // System.out.println(stwAnnotation);
+      stringsToMatch.remove(stwAnnotation.matchingText);
+    }
+    Assert.assertEquals("Some expected matches were not found.", Collections.EMPTY_SET,
+            stringsToMatch);
+  }
+
+  /**
+   * A basic test, just check more concept matches...
+   * 
+   * @throws IOException
+   */
+  @Test
+  public void testStwAnnotations2() throws IOException {
+    String content = "German beer price increases caused by Football World Cup";
+    List<StwAnnotation> cids = annotator.process(content);
+    Set<String> expectedMatches = new TreeSet<>(
+            Arrays.asList("German", "beer", "price", "Football", "World Cup"));
     for (Iterator iterator = cids.iterator(); iterator.hasNext();) {
       StwAnnotation stwAnnotation = (StwAnnotation) iterator.next();
       // System.out.println(stwAnnotation);
       expectedMatches.remove(stwAnnotation.matchingText);
     }
-    Assert.assertEquals("All expected matches found.", expectedMatches.isEmpty(), true);
+    Assert.assertEquals("Some expected matches were not found.", Collections.EMPTY_SET,
+            expectedMatches);
+  }
+
+  /**
+   * A basic test, just to check some offsets...
+   * 
+   * @throws IOException
+   */
+  @Test
+  public void testStwAnnotatorOffsets() throws IOException {
+    String content = "German beer price increases caused by Football World Cup";
+    List<StwAnnotation> cids = annotator.process(content);
+    Assert.assertTrue("assert that some annotations are found...", cids.size() > 2);
+    for (Iterator iterator = cids.iterator(); iterator.hasNext();) {
+      StwAnnotation anno = (StwAnnotation) iterator.next();
+      String phraseExtracted = content.substring(anno.begin, anno.end);
+      String phraseAnno = anno.matchingText;
+      String message = String.format("%s (from offsets %d-%d) must equal %s (from action)",
+              phraseExtracted, anno.begin, anno.end, phraseAnno);
+      Assert.assertTrue(message, phraseExtracted.equals(phraseAnno));
+    }
   }
 
 }

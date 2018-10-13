@@ -101,13 +101,13 @@ public class StwAutomataFactory {
       if (vocStrategy.contains(STRATEGY_OPTION_2)) {
         if (phrase.matches(".*&.*")) {
           // like R&D
-          regEx = NOT_WORDCHAR + phrase.replaceAll("[A-Z&](?=[A-Z&])", "$0 *") + NOT_WORDCHAR;
+          regEx = phrase.replaceAll("[A-Z&](?=[A-Z&])", "$0 *") + NOT_WORDCHAR;
           // System.out.printf("sp&cial phrase: %s (%s)%n", regEx, phrase);
         } else if (phrase.matches("[A-Z]+")) {
-          regEx = NOT_WORDCHAR + phrase.replaceAll("\\w", "$0\\\\.?") + NOT_WORDCHAR;
+          regEx = phrase.replaceAll("\\w", "$0\\\\.?") + NOT_WORDCHAR;
           // System.out.printf("UPPER phrase: %s (%s)%n", regEx, phrase);
         } else {
-          regEx = NOT_WORDCHAR + Term2Re.convert(phrase);
+          regEx = Term2Re.convert(phrase);
           // System.out.printf("Term2Re phrase: %s%n", regEx);
         }
       } else {

@@ -60,43 +60,50 @@ public class StwCodeAction extends AbstractFaAction {
   }
 
   @Override
-  public void invoke(StringBuilder yytext, int start, DfaRun runner) throws CallbackException {
+  public void invoke(StringBuilder yytext, final int start, DfaRun runner)
+          throws CallbackException {
     Map mapClientData = (Map) runner.clientData;
+    final int offsetYY = (int) mapClientData.get(ClientDataFactory.LAST_MATCH_OFFSET);
+    // note on yytext: is cleared after a match!
     String cid = this.code;
-    int end = yytext.length();
-    int startTotal = ((int) mapClientData.get(ClientDataFactory.LAST_MATCH_OFFSET)) + start;
-    int endCurrent = ((int) mapClientData.get(ClientDataFactory.LAST_MATCH_OFFSET)) + end;
-    // extract text
-    String substring = yytext.substring(start, end);
-    // trim text match
-    Matcher wsPat = PAT_FIX.matcher(substring);
-    wsPat.find();
-    int trimmedStart = start + wsPat.start(1);
-    int trimmedEnd = trimmedStart + wsPat.group(1).length();
-    String trimmedMatch = yytext.substring(trimmedStart, trimmedEnd);
-    if (verbose) {
-      System.out.printf("** %s%n** %s%n", substring.replace(" ", "#"),
-              trimmedMatch.replace(" ", "#"));
+    final int startInYY = start;
+    final int endInYY = yytext.length();
+    final int startTotal = offsetYY + startInYY;
+    final int endTotal = offsetYY + endInYY;
+    String textBefore = yytext.substring(0, startInYY);
+    if (textBefore.isEmpty() || textBefore.matches(".*[^A-Z0-9a-z]$")) {
+      String substring = yytext.substring(start, endInYY); // extract text
+      // trim text match
+      Matcher wsPat = PAT_FIX.matcher(substring);
+      wsPat.find();
+      final int trimmedStartYY = startInYY + wsPat.start(1);
+      final int trimmedEndYY = trimmedStartYY + wsPat.group(1).length();
+      String trimmedMatch = yytext.substring(trimmedStartYY, trimmedEndYY);
+      if (verbose) {
+        System.out.printf("** %s%n** %s%n", substring.replace(" ", "#"),
+                trimmedMatch.replace(" ", "#"));
+      }
+      final int trimmedStartTotal = offsetYY + trimmedStartYY;
+      final int trimmedEndTotal = offsetYY + trimmedEndYY;
+      // legacy code (simply record concept id):
+      Set<String> cids = (Set<String>) mapClientData.get(ClientDataFactory.CONCEPT_IDS);
+      cids.add(cid);
+      // new code:
+      Map<String, StwAnnotation> conceptMatches = (TreeMap) mapClientData
+              .get(ClientDataFactory.CONCEPT_MATCHES);
+      StwAnnotation annotation = new StwAnnotation(cid, trimmedMatch, trimmedStartTotal,
+              trimmedEndTotal);
+      conceptMatches.put(cid, annotation);
+      // debug:
+      if (verbose) {
+        System.out.println();
+        System.out.printf(">> code = %s%n", cid);
+        System.out.printf(">> %5d%n", trimmedStartYY);
+        System.out.printf(">>         %80s%n", yytext);
+        System.out.printf(">> match = %80s%n", trimmedMatch);
+      }
     }
-    // legacy code (simply record concept id):
-    Set<String> cids = (Set<String>) mapClientData.get(ClientDataFactory.CONCEPT_IDS);
-    cids.add(cid);
-    // new code:
-    Map<String, StwAnnotation> conceptMatches = (TreeMap) mapClientData
-            .get(ClientDataFactory.CONCEPT_MATCHES);
-    // FIXME start and yytext have different meaning than used here !
-    // conceptMatches.put(cid, new Object[] { cid, trimmedMatch, startTotal, endCurrent });
-    // conceptMatches.put(cid, new Object[] { cid, trimmedMatch, trimmedStart, trimmedEnd });
-    conceptMatches.put(cid, new StwAnnotation(cid, trimmedMatch, trimmedStart, trimmedEnd));
-    // debug:
-    if (verbose) {
-      System.out.println();
-      System.out.printf(">> code = %s%n", cid);
-      System.out.printf(">> %5d%n", trimmedStart);
-      System.out.printf(">>         %80s%n", yytext);
-      System.out.printf(">> match = %80s%n", trimmedMatch);
-    }
-    mapClientData.put(ClientDataFactory.LAST_MATCH_OFFSET, endCurrent);
+    mapClientData.put(ClientDataFactory.LAST_MATCH_OFFSET, endTotal);
   }
 
   @Override

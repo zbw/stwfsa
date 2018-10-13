@@ -51,7 +51,7 @@ public class StwAnnotator {
   }
 
   public List<StwAnnotation> process(String content) throws IOException {
-    String rInput = " " + content + " ";
+    String rInput = content + " ";
     rInput = StwAutomataFactory.preprocessContent(rInput, vocStrategy);
     // process input:
     CharSource in = new CharSequenceCharSource(rInput);
