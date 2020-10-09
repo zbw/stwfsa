@@ -1,4 +1,8 @@
-# About
+# Deprecated
+**STWFSA includes a [potential security vulnerability](https://github.com/advisories/GHSA-vwqq-5vrc-xw9h) and is no longer maintained**.
+**Please consider the [new implementation in python](https://github.com/zbw/stwfsapy).**
+**While it does not provide a REST API, it includes a scoring mechanism for matches.**
+## About
 
 This is a dictionary matching component for the [STW Thesaurus for Economics](http://zbw.eu/stw/version/latest/about) (STW).
 The software builds upon the finite-state-automaton (FSA) text filtering tool [monq](https://github.com/HaraldKi/monqjfa).
@@ -20,7 +24,7 @@ Author: [Martin Toepfer](https://www.zbw.eu/de/forschung/science-2-0/martin-toep
 
 ZBW - Leibniz Information Centre for Economics
 
-# Application
+## Application
 
 Before testing and building STWFSA, you should adapt the file *pom.xml*, e.g., set *STW_PTH*.
 When you have built STWFSA successfully and monq is on your classpath, you can run the tool like
@@ -40,15 +44,15 @@ explains all arguments and usage in more detail.
 You may want to have a look at [StwRecServe](src/main/java/eu/zbw/stwfsa/app/StwRecServe.java) as a starting point
 for offering dictionary matching as a webservice. 
 
-## Input and Output
+### Input and Output
 
 STWFSA reads and writes tab-separated (TSV) data.
 
-### Input
+#### Input
 
 Two columns. For each row: document id, content (short-text, e.g., title)
 
-### Output
+#### Output
 
 default: document id, concept id
 
@@ -58,17 +62,17 @@ option: `-info`:  document id, concept id, begin, end, covered text
 
 Please note, option `info` has precedence over option `compressed`.
 
-## Programmatic Use
+### Programmatic Use
 
 If you want to use STWFSA programmatically, please have a look at [StwAnnotator](src/main/java/eu/zbw/stwfsa/annotator/StwAnnotator.java).
 
 # Change Notes
 
-### v0.3-SNAPSHOT
+#### v0.3-SNAPSHOT
 
 - add simple server example
 
-### v0.2 - May 14, 2018
+#### v0.2 - May 14, 2018
 
 This is the first entry of the public changelog.
 
